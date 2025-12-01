@@ -214,7 +214,7 @@ longhornDriver:
       memory: 512Mi
 
 longhornUI:
-  replicas: 3
+  replicas: 2
   priorityClass: ~
   tolerations: []
   nodeSelector: {}
