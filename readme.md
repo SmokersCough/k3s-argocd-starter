@@ -296,9 +296,9 @@ You'll need to create two secrets for Cloudflare integration:
 # 6. Copy the token and your Cloudflare account email
 
 # Set credentials - NEVER COMMIT THESE!
-export CLOUDFLARE_API_TOKEN="your-api-token-here"
-export CLOUDFLARE_EMAIL="your-cloudflare-email"
-export DOMAIN="yourdomain.com"
+export CLOUDFLARE_API_TOKEN="sxDXwvb8frxgCXYVoSjq1LpDeKG_f1O_vZWugFg3"
+export CLOUDFLARE_EMAIL="katrelleprunty@icloud.com"
+export DOMAIN="katrelleslab.org
 export TUNNEL_NAME="k3s-cluster"  # Must match config.yaml
 ```
 
