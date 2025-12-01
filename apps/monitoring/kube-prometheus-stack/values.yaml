@@ -102,7 +102,7 @@ kubeControllerManager:
   endpoints: # ips of servers 
     - 192.168.50.41
     - 192.168.50.42
-    - 192.168.50.70
+    - 192.168.50.186
 
 coreDns:
   enabled: true
@@ -115,7 +115,7 @@ kubeEtcd:
   endpoints: # ips of servers
     - 192.168.50.41
     - 192.168.50.42
-    - 192.168.50.70
+    - 192.168.50.186
   service:
     enabled: true
     port: 2381
@@ -126,14 +126,14 @@ kubeScheduler:
   endpoints: # ips of servers
     - 192.168.50.41
     - 192.168.50.42
-    - 192.168.50.70
+    - 192.168.50.186
 
 kubeProxy:
   enabled: true
   endpoints: # ips of servers
     - 192.168.50.41
     - 192.168.50.42
-    - 192.168.50.70
+    - 192.168.50.186
 
 kubeStateMetrics:
   enabled: true
@@ -213,18 +213,18 @@ prometheus:
     retention: 7d
     resources:
       requests:
-        memory: 2Gi
-        cpu: 1000m
+        memory: 3Gi
+        cpu: 1500m
       limits:
-        memory: 2Gi
-        cpu: 1000m
+        memory: 3Gi
+        cpu: 1500m
     storageSpec:
       volumeClaimTemplate:
         spec:
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
-              storage: 20Gi
+              storage: 50Gi
     scrapeInterval: 30s
     evaluationInterval: 30s
     walCompression: true
