@@ -1,0 +1,305 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-primary
+  namespace: pihole
+  labels:
+    app: pihole-primary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole-primary
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pihole-primary
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - pihole-primary
+                - pihole-secondary
+            topologyKey: kubernetes.io/hostname
+      initContainers:
+      - name: remove-password
+        image: pihole/pihole:latest
+        command: ["/bin/bash"]
+        args:
+          - -c
+          - |
+            echo "Removing Pi-hole password..."
+            pihole setpassword
+            echo "Password removal completed"
+        volumeMounts:
+        - name: pihole-config
+          mountPath: /etc/pihole
+          subPath: pihole
+        envFrom:
+        - configMapRef:
+            name: pihole-config
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 53
+          protocol: TCP
+          name: dns-tcp
+        - containerPort: 53
+          protocol: UDP
+          name: dns-udp
+        - containerPort: 80
+          protocol: TCP
+          name: http
+        - containerPort: 443
+          protocol: TCP
+          name: https
+        envFrom:
+        - configMapRef:
+            name: pihole-config
+        volumeMounts:
+        - name: pihole-config
+          mountPath: /etc/pihole
+          subPath: pihole
+        - name: dnsmasq-config
+          mountPath: /etc/dnsmasq.d/99-custom.conf
+          subPath: custom.conf
+      - name: pihole-exporter
+        image: ekofr/pihole-exporter:latest
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+        ports:
+        - containerPort: 9617
+          name: metrics
+        env:
+        - name: PIHOLE_HOSTNAME
+          value: "localhost"
+        - name: PIHOLE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pihole-secret
+              key: webpassword
+        - name: INTERVAL
+          value: "30s"
+        - name: PORT
+          value: "9617"
+      volumes:
+      - name: pihole-config
+        persistentVolumeClaim:
+          claimName: pihole-primary-pvc
+      - name: dnsmasq-config
+        configMap:
+          name: pihole-dnsmasq-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pihole-secondary
+  namespace: pihole
+  labels:
+    app: pihole-secondary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pihole-secondary
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pihole-secondary
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - pihole-primary
+                - pihole-secondary
+            topologyKey: kubernetes.io/hostname
+      initContainers:
+      - name: remove-password
+        image: pihole/pihole:latest
+        command: ["/bin/bash"]
+        args:
+          - -c
+          - |
+            echo "Removing Pi-hole password..."
+            pihole setpassword
+            echo "Password removal completed"
+        volumeMounts:
+        - name: pihole-config
+          mountPath: /etc/pihole
+          subPath: pihole
+        envFrom:
+        - configMapRef:
+            name: pihole-secondary-config
+      containers:
+      - name: pihole
+        image: pihole/pihole:latest
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        ports:
+        - containerPort: 53
+          protocol: TCP
+          name: dns-tcp
+        - containerPort: 53
+          protocol: UDP
+          name: dns-udp
+        - containerPort: 80
+          protocol: TCP
+          name: http
+        - containerPort: 443
+          protocol: TCP
+          name: https
+        envFrom:
+        - configMapRef:
+            name: pihole-secondary-config
+        volumeMounts:
+        - name: pihole-config
+          mountPath: /etc/pihole
+          subPath: pihole
+        - name: dnsmasq-config
+          mountPath: /etc/dnsmasq.d/99-custom.conf
+          subPath: custom.conf
+      - name: pihole-exporter
+        image: ekofr/pihole-exporter:latest
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "128Mi"
+          requests:
+            cpu: "50m"
+            memory: "64Mi"
+        ports:
+        - containerPort: 9617
+          name: metrics
+        env:
+        - name: PIHOLE_HOSTNAME
+          value: "localhost"
+        - name: PIHOLE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: pihole-secret
+              key: webpassword
+        - name: INTERVAL
+          value: "30s"
+        - name: PORT
+          value: "9617"
+      volumes:
+      - name: pihole-config
+        persistentVolumeClaim:
+          claimName: pihole-secondary-pvc
+      - name: dnsmasq-config
+        configMap:
+          name: pihole-dnsmasq-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nebula-sync
+  namespace: pihole
+  labels:
+    app: nebula-sync
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nebula-sync
+  template:
+    metadata:
+      labels:
+        app: nebula-sync
+    spec:
+      containers:
+      - name: nebula-sync
+        image: ghcr.io/lovelaze/nebula-sync:latest
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "256Mi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+        env:
+          # Connection Settings
+        - name: PRIMARY
+          value: "http://192.168.50.81|uv6OOv0V"
+        - name: REPLICAS
+          value: "http://192.168.50.82|iux-hibB"
+        - name: CLIENT_SKIP_TLS_VERIFICATION
+          value: "true"
+
+          # Sync Settings
+        - name: FULL_SYNC
+          value: "false"
+        - name: RUN_GRAVITY
+          value: "true"
+        - name: CRON
+          value: "0 0 * * *"
+
+          # Time Zone
+        - name: TZ
+          value: "America/New_York"
+
+          # Configuration Sync Settings
+        - name: SYNC_CONFIG_DNS
+          value: "true"
+        - name: SYNC_CONFIG_DHCP
+          value: "false"
+        - name: SYNC_CONFIG_NTP
+          value: "false"
+        - name: SYNC_CONFIG_RESOLVER
+          value: "false"
+        - name: SYNC_CONFIG_DATABASE
+          value: "false"
+        - name: SYNC_CONFIG_MISC
+          value: "false"
+        - name: SYNC_CONFIG_DEBUG
+          value: "false"
+
+          # Gravity Sync Settings
+        - name: SYNC_GRAVITY_DHCP_LEASES
+          value: "false"
+        - name: SYNC_GRAVITY_GROUP
+          value: "false"
+        - name: SYNC_GRAVITY_AD_LIST
+          value: "true"
+        - name: SYNC_GRAVITY_AD_LIST_BY_GROUP
+          value: "true"
+        - name: SYNC_GRAVITY_DOMAIN_LIST
+          value: "true"
+        - name: SYNC_GRAVITY_DOMAIN_LIST_BY_GROUP
+          value: "true"
+        - name: SYNC_GRAVITY_CLIENT
+          value: "false"
+        - name: SYNC_GRAVITY_CLIENT_BY_GROUP
+          value: "false" 

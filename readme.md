@@ -122,7 +122,7 @@ echo -e "xt_socket\niptable_raw" | sudo tee /etc/modules-load.d/cilium.conf
 ### 2. K3s Installation
 ```bash
 # Customize these values!
-export SETUP_NODEIP=192.168.101.176  # Your node IP
+export SETUP_NODEIP=192.168.50.177  # Your node IP
 export SETUP_CLUSTERTOKEN=randomtokensecret12343  # Strong token
 
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION="v1.33.3+k3s1" \

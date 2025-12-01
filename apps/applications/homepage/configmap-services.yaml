@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-services
+  namespace: homepage
+  labels:
+    app: homepage
+data:
+  services.yaml: |
+    - 🌐 DNS & Network:
+        - Pi-hole Primary:
+            href: https://pihole.katrelleslab.org/admin
+            icon: si-pihole
+            description: "Primary DNS server with ad-blocking capabilities - Click to access admin interface"
+            widget:
+              type: pihole
+              url: http://192.168.50.81
+              version: 6
+              key: 
+              fields: ["queries", "blocked", "blocked_percent", "gravity"]
+        - Pi-hole Secondary:
+            href: https://pihole2.katrelleslab.org/admin
+            icon: si-pihole
+            description: "Secondary DNS server for redundancy and failover - Click to access admin interface"
+            widget:
+              type: pihole
+              url: http://192.168.50.82
+              version: 6
+              key: 
+              fields: ["queries", "blocked", "blocked_percent", "gravity"]
+        - Cloudflare Tunnels:
+            href: https://one.dash.cloudflare.com
+            icon: si-cloudflare
+            description: "Secure tunnel connections for external access to K3s services"
+            widget:
+              type: cloudflared
+              accountid: "8b194401fe75816e3449d0fe24814934"
+              tunnelid: "abb583a5-829b-47e1-bd04-89aefc3fab07"
+              key: "XhEa1YozUf_QAwh6-BupEnWWmK5BEKdxPevIR6o7"
+              fields: ["status", "origin_ip"]
+    - 🤖 Automation & Monitoring:
+        - n8n:
+            href: https://n8n.katrelleslab.org
+            icon: si-n8n
+            description: "Visual workflow automation platform for connecting apps and services"
+        - Uptime Kuma:
+            href: https://uptime.katrelleslab.org
+            icon: si-uptimekuma
+            description: "Real-time monitoring and status page for all services"
+    - 📊 Observability:
+        - Grafana:
+            href: https://grafana.katrelleslab.org
+            icon: si-grafana
+            description: "Metrics visualization and monitoring dashboards"
+        - Prometheus:
+            href: https://prometheus.katrelleslab.org
+            icon: si-prometheus
+            description: "Time-series database and monitoring system"
+        - Longhorn:
+            href: https://longhorn.katrelleslab.org
+            icon: si-longhorn
+            description: "Distributed block storage for Kubernetes with web UI"

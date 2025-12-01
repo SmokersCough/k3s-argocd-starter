@@ -1,25 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: infrastructure-components
+  name: applications
+  namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-2"
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   generators:
   - git:
       repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
       revision: HEAD
       directories:
-      - path: infrastructure/networking/*
-      - path: infrastructure/storage/*
-      - path: infrastructure/controllers/*
+      - path: apps/applications/*
+      - exclude: true
+        path: apps/applications/applications-appset.yaml
   template:
     metadata:
       name: '{{path.basename}}'
       labels:
-        type: infrastructure
+        type: application
     spec:
-      project: infrastructure
+      project: applications
       source:
         plugin:
           name: kustomize-build-with-helm
@@ -40,9 +41,10 @@ spec:
             factor: 2
             maxDuration: 3m
         syncOptions:
-        - CreateNamespace=true
-        - ServerSideApply=true
-        - RespectIgnoreDifferences=true
-        - ApplyOutOfSyncOnly=true
-        - Replace=false
-        - IgnoreMissingTemplate=true
+          - CreateNamespace=true
+          - ServerSideApply=true
+          - RespectIgnoreDifferences=true
+          - ApplyOutOfSyncOnly=true
+          - Replace=false
+          - IgnoreMissingTemplate=true
+

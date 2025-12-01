@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: uptime-kuma
+  labels:
+    name: uptime-kuma
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/component: monitoring
+    app.kubernetes.io/part-of: homelab-infrastructure
+

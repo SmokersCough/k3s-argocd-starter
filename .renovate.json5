@@ -1,0 +1,116 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Group Helm chart updates",
+      "matchManagers": ["helm-values", "helmv3"],
+      "groupName": "helm charts",
+      "groupSlug": "helm",
+      "schedule": ["before 10am on monday"]
+    },
+    {
+      "description": "Automerge patch updates for infrastructure",
+      "matchPaths": ["apps/infrastructure/**"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "requiredStatusChecks": []
+    },
+    {
+      "description": "Automerge patch updates for monitoring",
+      "matchPaths": ["apps/monitoring/**"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "requiredStatusChecks": []
+    },
+    {
+      "description": "Weekly updates for major versions",
+      "matchUpdateTypes": ["major"],
+      "schedule": ["before 10am on monday"],
+      "groupName": "major updates",
+      "groupSlug": "major"
+    },
+    {
+      "description": "Daily updates for patch versions",
+      "matchUpdateTypes": ["patch"],
+      "schedule": ["before 6am"]
+    },
+    {
+      "description": "cert-manager updates",
+      "matchPackageNames": ["cert-manager"],
+      "matchManagers": ["helm-values"],
+      "groupName": "cert-manager",
+      "schedule": ["before 10am on monday"]
+    },
+    {
+      "description": "ArgoCD updates",
+      "matchPackageNames": ["argo-cd"],
+      "matchManagers": ["helm-values"],
+      "groupName": "argocd",
+      "schedule": ["before 10am on monday"]
+    },
+    {
+      "description": "Traefik updates",
+      "matchPackageNames": ["traefik"],
+      "matchManagers": ["helm-values"],
+      "groupName": "traefik",
+      "schedule": ["before 10am on monday"]
+    },
+    {
+      "description": "Longhorn updates",
+      "matchPackageNames": ["longhorn"],
+      "matchManagers": ["helm-values"],
+      "groupName": "longhorn",
+      "schedule": ["before 10am on monday"]
+    },
+    {
+      "description": "Prometheus stack updates",
+      "matchPackageNames": ["kube-prometheus-stack"],
+      "matchManagers": ["helm-values"],
+      "groupName": "prometheus-stack",
+      "schedule": ["before 10am on monday"]
+    }
+  ],
+  "helm": {
+    "fileMatch": [
+      "**/values.yaml",
+      "**/kustomization.yaml"
+    ]
+  },
+  "kubernetes": {
+    "fileMatch": [
+      "**/*.yaml",
+      "**/*.yml"
+    ]
+  },
+  "docker": {
+    "fileMatch": [
+      "**/Dockerfile",
+      "**/deployment.yaml",
+      "**/daemonset.yaml"
+    ]
+  },
+  "separateMinorPatch": true,
+  "separateMajorMinor": false,
+  "timezone": "America/New_York",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "rebaseWhen": "behind-base-branch",
+  "platform": "github",
+  "autodiscover": true,
+  "autodiscoverFilter": [
+    "/home/trelle/k3s-argocd-starter"
+  ]
+}
+

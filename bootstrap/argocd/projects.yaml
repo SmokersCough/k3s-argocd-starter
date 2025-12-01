@@ -69,3 +69,4 @@ spec:
       description: Admin role for monitoring project
       policies:
         - p, proj:monitoring:admin, applications, *, monitoring/*, allow
+

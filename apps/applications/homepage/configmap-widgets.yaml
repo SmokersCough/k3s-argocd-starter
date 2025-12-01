@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-widgets
+  namespace: homepage
+  labels:
+    app: homepage
+data:
+  widgets.yaml: |
+    - resources:
+        cpu: true
+        memory: true
+        disk: /
+        cputemp: true
+        uptime: true
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "K3s Cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+    - datetime:
+        text_size: xl
+        format:
+          timeStyle: short
+          dateStyle: short
+          hourCycle: h23
+    - search:
+        provider: duckduckgo
+        target: _blank
+        showSearchSuggestions: true
+    - longhorn:
+        expanded: true
+        total: true
+        labels: true
+        nodes: false

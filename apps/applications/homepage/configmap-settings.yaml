@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-settings
+  namespace: homepage
+  labels:
+    app: homepage
+data:
+  settings.yaml: |
+    title: "K3s Homelab Dashboard"
+    favicon: "https://kubernetes.io/images/favicon.png"
+    language: "en"
+    theme: "dark"
+    color: "slate"
+    headerStyle: "boxed"
+    statusStyle: "dot"
+    background:
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+      blur: "sm"
+      saturate: 50
+      brightness: 50
+      opacity: 20
+    layout:
+      "🌐 DNS & Network":
+        style: "row"
+        columns: 2
+        header: true
+      "🤖 Automation & Monitoring":
+        style: "row"
+        columns: 2
+        header: true
+      "📊 Observability":
+        style: "row"
+        columns: 2
+        header: true
+    quicklaunch:
+      searchDescriptions: true
+      hideInternetSearch: false
+      hideVisitURL: false
+    providers:
+      openweathermap: "openweathermapapikey"
+      weatherapi: "weatherapiapikey"
+      longhorn:
+        url: https://longhorn.katrelleslab.org/

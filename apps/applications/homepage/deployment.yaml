@@ -1,0 +1,133 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homepage
+  namespace: homepage
+  labels:
+    app: homepage
+    app.kubernetes.io/name: homepage
+    app.kubernetes.io/component: dashboard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: homepage
+  template:
+    metadata:
+      labels:
+        app: homepage
+        app.kubernetes.io/name: homepage
+        app.kubernetes.io/component: dashboard
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
+      initContainers:
+      - name: copy-config
+        image: busybox:1.35
+        command: ['sh', '-c']
+        args:
+          - |
+            echo "Copying config template..."
+            cp /app/config-template/* /app/config/
+            echo "Config copied successfully"
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+        - name: config-template
+          mountPath: /app/config-template
+          readOnly: true
+      containers:
+      - name: homepage
+        image: ghcr.io/gethomepage/homepage:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        env:
+        - name: PUID
+          value: "1000"
+        - name: PGID
+          value: "1000"
+        - name: TZ
+          value: "America/New_York"
+        - name: LOG_LEVEL
+          value: "debug"
+        - name: HOMEPAGE_ALLOWED_HOSTS
+          value: "homepage.katrelleslab.org,localhost,127.0.0.1"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: false
+        - name: settings
+          mountPath: /app/config/settings.yaml
+          subPath: settings.yaml
+          readOnly: true
+        - name: services
+          mountPath: /app/config/services.yaml
+          subPath: services.yaml
+          readOnly: true
+        - name: widgets
+          mountPath: /app/config/widgets.yaml
+          subPath: widgets.yaml
+          readOnly: true
+        - name: bookmarks
+          mountPath: /app/config/bookmarks.yaml
+          subPath: bookmarks.yaml
+          readOnly: true
+      volumes:
+      - name: config
+        emptyDir: {}
+      - name: config-template
+        configMap:
+          name: homepage-config
+      - name: settings
+        configMap:
+          name: homepage-settings
+      - name: services
+        configMap:
+          name: homepage-services
+      - name: widgets
+        configMap:
+          name: homepage-widgets
+      - name: bookmarks
+        configMap:
+          name: homepage-bookmarks

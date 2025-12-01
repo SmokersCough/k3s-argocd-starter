@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-configmap
+  namespace: n8n 
+  labels:
+    app: n8n
+    component: configmap
+data:
+  # Environment
+  NODE_ENV: "production"
+  GENERIC_TIMEZONE: "Europe/Warsaw"
+  
+  # URLs and Webhooks
+  WEBHOOK_URL: "https://n8n.katrelleslab.org/"
+  N8N_EDITOR_BASE_URL: "https://n8n.katrelleslab.org/"
+  
+  # Database configurations
+  DB_TYPE: "postgresdb"
+  DB_POSTGRESDB_USER: "n8n"
+  DB_POSTGRESDB_DATABASE: "n8n"
+  DB_POSTGRESDB_HOST: "postgres-service"
+  DB_POSTGRESDB_PORT: "5432"
+  DB_POSTGRESDB_SCHEMA: "public"
+  
+  # Security settings
+  N8N_SECURE_COOKIE: "true"
+  
+  # Performance optimizations for K3s
+  EXECUTIONS_PROCESS: "main"
+  EXECUTIONS_MODE: "regular"
+  N8N_LOG_LEVEL: "info"
+  N8N_LOG_OUTPUT: "console"
+  
+  # Disable telemetry for privacy
+  N8N_DIAGNOSTICS_ENABLED: "false"
+  N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+  N8N_TEMPLATES_ENABLED: "true"
+  
+  # Resource limits
+  N8N_PAYLOAD_SIZE_MAX: "16"

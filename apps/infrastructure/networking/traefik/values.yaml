@@ -1,0 +1,115 @@
+# Traefik Helm Chart Values
+# Optimized for K3s homelab with cert-manager integration
+
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 2
+
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+
+providers:
+  kubernetesIngress:
+    enabled: true
+    ingressClass: "traefik"
+  kubernetesCRD:
+    enabled: true
+    ingressClass: "traefik"
+
+ports:
+  web:
+    port: 8000
+    expose:
+      default: true
+      exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    expose:
+      default: true
+      exposedPort: 443
+    protocol: TCP
+    http3:
+      enabled: true
+    tls:
+      enabled: true
+      certResolver: "letsencrypt"
+
+# Certificates resolver for cert-manager
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: admin@katrelleslab.org
+      storage: /data/acme.json
+      httpChallenge:
+        entryPoint: web
+
+# Enable metrics for Prometheus
+metrics:
+  prometheus:
+    entryPoint: metrics
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    service:
+      enabled: true
+
+# Logging configuration
+logs:
+  general:
+    format: json
+    level: INFO
+  access:
+    enabled: true
+    format: json
+
+# Additional arguments
+additionalArguments:
+  - "--log.level=INFO"
+  - "--accesslog"
+  - "--accesslog.format=json"
+  - "--metrics.prometheus=true"
+  - "--entryPoints.websecure.http.tls=true"
+  - "--entryPoints.websecure.http3"
+
+# Resource limits
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+# Service configuration
+service:
+  enabled: true
+  type: LoadBalancer
+  spec:
+    externalTrafficPolicy: Local
+
+# Security context
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+
+podSecurityContext:
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+
+# Persistence for ACME certificates
+persistence:
+  enabled: true
+  name: data
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+
+# Pod priority
+priorityClassName: "system-cluster-critical"
+

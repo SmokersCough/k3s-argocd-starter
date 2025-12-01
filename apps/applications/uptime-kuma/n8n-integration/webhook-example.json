@@ -1,0 +1,311 @@
+{
+  "name": "Uptime Kuma Alert Handler",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "uptime-alert",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook - Uptime Kuma",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "uptime-kuma-alerts"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json[\"body\"][\"status\"]}}",
+              "operation": "equals",
+              "value2": "down"
+            }
+          ]
+        }
+      },
+      "id": "check-status",
+      "name": "Check if Service Down",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format alert message for notifications\nconst monitor = $input.item.json.body.monitor;\nconst status = $input.item.json.body.status;\nconst message = $input.item.json.body.message;\nconst time = $input.item.json.body.time;\nconst url = $input.item.json.body.url;\n\nconst formattedMessage = {\n  title: `🚨 Service Alert: ${monitor}`,\n  status: status.toUpperCase(),\n  description: message,\n  timestamp: new Date(time).toISOString(),\n  url: url,\n  severity: status === 'down' ? 'critical' : 'warning',\n  color: status === 'down' ? '#FF0000' : '#FFA500'\n};\n\nreturn { json: formattedMessage };"
+      },
+      "id": "format-message",
+      "name": "Format Alert Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "content": "## 🚨 Service Alert\n\n**Monitor:** {{$json[\"title\"]}}\n**Status:** {{$json[\"status\"]}}\n**Message:** {{$json[\"description\"]}}\n**Time:** {{$json[\"timestamp\"]}}\n**URL:** {{$json[\"url\"]}}\n\n---\n_Automated alert from Uptime Kuma via n8n_",
+        "channel": "C0XXXXXXXXX",
+        "otherOptions": {
+          "username": "Uptime Kuma",
+          "icon_emoji": ":chart_with_upwards_trend:"
+        }
+      },
+      "id": "slack-notification",
+      "name": "Send to Slack",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 1,
+      "position": [850, 100],
+      "credentials": {
+        "slackApi": {
+          "id": "1",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "subject": "🚨 Service Alert: {{$json[\"title\"]}}",
+        "emailType": "html",
+        "message": "<html>\n<body>\n  <h2>Service Alert</h2>\n  <table>\n    <tr><td><strong>Monitor:</strong></td><td>{{$json[\"title\"]}}</td></tr>\n    <tr><td><strong>Status:</strong></td><td style=\"color: {{$json[\"color\"]}}\">{{$json[\"status\"]}}</td></tr>\n    <tr><td><strong>Message:</strong></td><td>{{$json[\"description\"]}}</td></tr>\n    <tr><td><strong>Time:</strong></td><td>{{$json[\"timestamp\"]}}</td></tr>\n    <tr><td><strong>URL:</strong></td><td><a href=\"{{$json[\"url\"]}}\">{{$json[\"url\"]}}</a></td></tr>\n  </table>\n  <p><em>Automated alert from Uptime Kuma via n8n</em></p>\n</body>\n</html>",
+        "options": {},
+        "fromEmail": "alerts@katrelleslab.org",
+        "toEmail": "admin@katrelleslab.org"
+      },
+      "id": "email-notification",
+      "name": "Send Email Alert",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [850, 200],
+      "credentials": {
+        "smtp": {
+          "id": "1",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "table": "uptime_alerts",
+        "columns": {
+          "monitor": "={{$json[\"title\"]}}",
+          "status": "={{$json[\"status\"]}}",
+          "message": "={{$json[\"description\"]}}",
+          "url": "={{$json[\"url\"]}}",
+          "timestamp": "={{$json[\"timestamp\"]}}",
+          "severity": "={{$json[\"severity\"]}}"
+        }
+      },
+      "id": "log-to-database",
+      "name": "Log to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "postgres": {
+          "id": "1",
+          "name": "PostgreSQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "success",
+              "value": "true"
+            },
+            {
+              "name": "message",
+              "value": "Alert processed successfully"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "response-success",
+      "name": "Response - Success",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 200]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "success",
+              "value": "true"
+            },
+            {
+              "name": "message",
+              "value": "Service is up, no action needed"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "response-no-action",
+      "name": "Response - No Action",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [650, 400]
+    }
+  ],
+  "connections": {
+    "Webhook - Uptime Kuma": {
+      "main": [
+        [
+          {
+            "node": "Check if Service Down",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Service Down": {
+      "main": [
+        [
+          {
+            "node": "Format Alert Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Response - No Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Slack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Email Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Log to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to Slack": {
+      "main": [
+        [
+          {
+            "node": "Response - Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Alert": {
+      "main": [
+        [
+          {
+            "node": "Response - Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Database": {
+      "main": [
+        [
+          {
+            "node": "Response - Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response - Success": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response - No Action": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "monitoring",
+      "id": "1"
+    },
+    {
+      "name": "alerts",
+      "id": "2"
+    }
+  ],
+  "pinData": {},
+  "versionId": "1"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

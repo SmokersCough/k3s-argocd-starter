@@ -1,0 +1,103 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uptime-kuma
+  namespace: uptime-kuma
+  labels:
+    app: uptime-kuma
+    app.kubernetes.io/name: uptime-kuma
+    app.kubernetes.io/component: monitoring
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # SQLite doesn't support multiple writers
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+        app.kubernetes.io/name: uptime-kuma
+        app.kubernetes.io/component: monitoring
+    spec:
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+        runAsNonRoot: false
+      containers:
+      - name: uptime-kuma
+        image: louislam/uptime-kuma:1.23.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 3001
+          protocol: TCP
+        env:
+        - name: UPTIME_KUMA_PORT
+          value: "3001"
+        - name: TZ
+          value: "America/New_York"
+        - name: PUID
+          value: "0"
+        - name: PGID
+          value: "0"
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            node server/server.js
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+          runAsUser: 0
+          capabilities:
+            drop:
+            - ALL
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /
+            port: 3001
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
+        volumeMounts:
+        - name: uptime-kuma-data
+          mountPath: /app/data
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: uptime-kuma-data
+        persistentVolumeClaim:
+          claimName: uptime-kuma-pvc
+      - name: tmp
+        emptyDir: {}
+

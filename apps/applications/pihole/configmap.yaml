@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-config
+  namespace: pihole
+data:
+  TZ: "America/New_York"
+  WEBPASSWORD: ""  # No password - Pi-hole will start without authentication
+  DNSSEC: "true"
+  DNS_BOGUS_PRIV: "true"
+  DNSMASQ_LISTENING: "all"
+  # New Pi-hole v6 settings
+  FTLCONF_dns_listeningMode: "all"  # Explicitly set listening mode for v6
+  FTLCONF_dns_localService: "false" # Allow connections from non-local networks
+  ServerIP: "192.168.50.81"  # Primary Pi-hole IP
+  PROXY_LOCATION: "pihole"  # For reverse proxy
+  VIRTUAL_HOST: "pihole.1.network"  # Update with your domain
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-secondary-config
+  namespace: pihole
+data:
+  TZ: "UTC"
+  WEBPASSWORD: ""  # No password - Pi-hole will start without authentication
+  DNSSEC: "true"
+  DNS_BOGUS_PRIV: "true"
+  DNSMASQ_LISTENING: "all"
+  # New Pi-hole v6 settings
+  FTLCONF_dns_listeningMode: "all"  # Explicitly set listening mode for v6
+  FTLCONF_dns_localService: "false" # Allow connections from non-local networks
+  ServerIP: "192.168.50.82"  # Secondary Pi-hole IP
+  PROXY_LOCATION: "pihole"  # For reverse proxy
+  VIRTUAL_HOST: "pihole.1.network"  # Update with your domain
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-dnsmasq-config
+  namespace: pihole
+data:
+  custom.conf: |
+    # Allow queries from Kubernetes network
+    interface=*
+    except-interface=lo
+    bind-interfaces
+    local-service=no 

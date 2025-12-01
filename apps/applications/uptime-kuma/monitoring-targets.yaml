@@ -1,0 +1,457 @@
+# Monitoring Targets Reference
+# This file provides a comprehensive list of services to monitor with Uptime Kuma
+# Copy these configurations into your Uptime Kuma dashboard
+
+---
+# CORE APPLICATIONS
+---
+
+- name: "n8n Workflow Automation"
+  type: "HTTP(s)"
+  url: "https://n8n.katrelleslab.org"
+  interval: 60
+  retries: 3
+  timeout: 10
+  keyword: "n8n"  # Optional: Check for specific text
+  expected_status_code: 200
+  follow_redirects: true
+  ignore_tls: false
+  notification_list:
+    - "Email - Homelab Alerts"
+    - "n8n Webhook"
+  tags:
+    - "application"
+    - "critical"
+    - "workflow"
+
+- name: "Pi-hole Primary DNS"
+  type: "HTTP(s)"
+  url: "https://pihole-primary.katrelleslab.org/admin"
+  interval: 60
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+    - "n8n Webhook"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "dns"
+
+- name: "Pi-hole Secondary DNS"
+  type: "HTTP(s)"
+  url: "https://pihole-secondary.katrelleslab.org/admin"
+  interval: 60
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "dns"
+
+- name: "ArgoCD GitOps"
+  type: "HTTP(s)"
+  url: "https://argocd.katrelleslab.org"
+  interval: 120
+  retries: 3
+  timeout: 15
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "application"
+    - "warning"
+    - "gitops"
+
+- name: "RetroArch Gaming"
+  type: "HTTP(s)"
+  url: "https://retroarch.katrelleslab.org"
+  interval: 300
+  retries: 2
+  timeout: 10
+  expected_status_code: 200
+  tags:
+    - "application"
+    - "info"
+    - "gaming"
+
+---
+# MONITORING & OBSERVABILITY
+---
+
+- name: "Grafana Dashboard"
+  type: "HTTP(s)"
+  url: "https://grafana.katrelleslab.org"
+  interval: 120
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "monitoring"
+    - "warning"
+    - "dashboard"
+
+- name: "Prometheus Metrics"
+  type: "HTTP(s)"
+  url: "https://prometheus.katrelleslab.org"
+  interval: 120
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "monitoring"
+    - "warning"
+    - "metrics"
+
+- name: "Longhorn Storage UI"
+  type: "HTTP(s)"
+  url: "https://longhorn.katrelleslab.org"
+  interval: 120
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "infrastructure"
+    - "warning"
+    - "storage"
+
+- name: "Uptime Kuma (Self-Monitor)"
+  type: "HTTP(s)"
+  url: "https://uptime.katrelleslab.org"
+  interval: 60
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "monitoring"
+    - "critical"
+    - "self-monitor"
+
+---
+# INTERNAL KUBERNETES SERVICES
+---
+
+- name: "K3s API Server"
+  type: "TCP Port"
+  hostname: "kubernetes.default.svc.cluster.local"
+  port: 443
+  interval: 60
+  retries: 3
+  timeout: 10
+  notification_list:
+    - "Email - Homelab Alerts"
+    - "n8n Webhook"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "kubernetes"
+
+- name: "CoreDNS Service"
+  type: "DNS"
+  hostname: "kubernetes.default.svc.cluster.local"
+  dns_server: "kube-dns.kube-system.svc.cluster.local"
+  dns_record_type: "A"
+  interval: 120
+  retries: 3
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "dns"
+
+- name: "Traefik Ingress Controller"
+  type: "HTTP(s)"
+  url: "http://traefik.kube-system.svc.cluster.local:8080/ping"
+  interval: 60
+  retries: 3
+  timeout: 5
+  expected_status_code: 200
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "ingress"
+
+---
+# DATABASE SERVICES
+---
+
+- name: "PostgreSQL (n8n)"
+  type: "TCP Port"
+  hostname: "postgres.n8n.svc.cluster.local"
+  port: 5432
+  interval: 120
+  retries: 3
+  timeout: 10
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "infrastructure"
+    - "critical"
+    - "database"
+
+---
+# TLS CERTIFICATE MONITORING
+---
+
+- name: "Wildcard Certificate - *.katrelleslab.org"
+  type: "HTTP(s) - Keyword"
+  url: "https://uptime.katrelleslab.org"
+  interval: 86400  # Check daily
+  retries: 2
+  certificate_expiry_days: 30  # Alert 30 days before expiry
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "security"
+    - "warning"
+    - "certificate"
+
+- name: "Main Domain Certificate - katrelleslab.org"
+  type: "HTTP(s)"
+  url: "https://katrelleslab.org"
+  interval: 86400  # Check daily
+  certificate_expiry_days: 30
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "security"
+    - "warning"
+    - "certificate"
+
+---
+# EXTERNAL DEPENDENCIES
+---
+
+- name: "Cloudflare DNS"
+  type: "DNS"
+  hostname: "katrelleslab.org"
+  dns_server: "1.1.1.1"
+  dns_record_type: "A"
+  interval: 300
+  retries: 3
+  notification_list:
+    - "Email - Homelab Alerts"
+  tags:
+    - "external"
+    - "warning"
+    - "dns"
+
+- name: "Let's Encrypt API"
+  type: "HTTP(s)"
+  url: "https://acme-v02.api.letsencrypt.org/directory"
+  interval: 300
+  retries: 3
+  timeout: 10
+  expected_status_code: 200
+  tags:
+    - "external"
+    - "info"
+    - "certificate"
+
+---
+# OPTIONAL: CONTAINER HEALTH CHECKS
+# (Requires Docker socket access - not enabled by default for security)
+---
+
+# - name: "n8n Container"
+#   type: "Docker Container"
+#   container_name: "n8n"
+#   expected_status: "running"
+#   interval: 120
+
+# - name: "Uptime Kuma Container"
+#   type: "Docker Container"
+#   container_name: "uptime-kuma"
+#   expected_status: "running"
+#   interval: 60
+
+---
+# NOTIFICATION CONFIGURATION EXAMPLES
+---
+
+notifications:
+  - name: "Email - Homelab Alerts"
+    type: "email"
+    smtp_host: "smtp.gmail.com"
+    smtp_port: 587
+    smtp_security: "TLS"
+    from_email: "alerts@katrelleslab.org"
+    to_email: "admin@katrelleslab.org"
+    
+  - name: "n8n Webhook"
+    type: "webhook"
+    url: "https://n8n.katrelleslab.org/webhook/uptime-alert"
+    method: "POST"
+    content_type: "application/json"
+    body: |
+      {
+        "monitor": "[[MONITOR_NAME]]",
+        "status": "[[STATUS]]",
+        "message": "[[MESSAGE]]",
+        "time": "[[TIME]]",
+        "url": "[[URL]]"
+      }
+    
+  - name: "Discord - Homelab"
+    type: "discord"
+    webhook_url: "https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN"
+    username: "Uptime Kuma"
+    
+  - name: "Slack - Alerts"
+    type: "slack"
+    webhook_url: "https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK"
+    channel: "#alerts"
+    username: "Uptime Kuma"
+    icon_emoji: ":chart_with_upwards_trend:"
+
+---
+# MONITOR GROUPS & STATUS PAGES
+---
+
+status_pages:
+  - name: "Homelab Services"
+    slug: "homelab-status"
+    theme: "dark"
+    published: true
+    show_tags: true
+    show_powered_by: false
+    groups:
+      - name: "Core Applications"
+        monitors:
+          - "n8n Workflow Automation"
+          - "Pi-hole Primary DNS"
+          - "Pi-hole Secondary DNS"
+          - "ArgoCD GitOps"
+          
+      - name: "Monitoring & Observability"
+        monitors:
+          - "Grafana Dashboard"
+          - "Prometheus Metrics"
+          - "Uptime Kuma (Self-Monitor)"
+          
+      - name: "Infrastructure"
+        monitors:
+          - "K3s API Server"
+          - "Traefik Ingress Controller"
+          - "Longhorn Storage UI"
+
+---
+# TAGS REFERENCE
+---
+
+# Severity Levels:
+# - critical: Services that must be running 24/7
+# - warning: Important services, but brief downtime acceptable
+# - info: Non-critical services for informational monitoring
+
+# Categories:
+# - application: User-facing applications
+# - infrastructure: Core infrastructure components
+# - monitoring: Monitoring and observability tools
+# - security: Security-related services
+# - external: External dependencies
+
+# Service Types:
+# - dns: DNS services
+# - database: Database services
+# - storage: Storage services
+# - ingress: Ingress and networking
+# - workflow: Workflow automation
+# - gitops: GitOps and CI/CD
+# - certificate: Certificate management
+
+---
+# MAINTENANCE WINDOWS
+---
+
+# Schedule maintenance windows to prevent false alerts during:
+# - Kubernetes upgrades
+# - Application deployments
+# - Infrastructure maintenance
+# - Scheduled backups
+
+# Example: Weekly maintenance on Sundays 2-4 AM
+# maintenance_schedule:
+#   - day: "Sunday"
+#     start_time: "02:00"
+#     end_time: "04:00"
+#     timezone: "America/New_York"
+#     affected_monitors:
+#       - "ALL"  # or specific monitor names
+
+---
+# BEST PRACTICES
+---
+
+# 1. Monitor Intervals:
+#    - Critical services: 60 seconds
+#    - Standard services: 120 seconds
+#    - Low priority: 300 seconds
+#    - Daily checks: 86400 seconds
+
+# 2. Retry Configuration:
+#    - Critical: 3 retries
+#    - Standard: 2-3 retries
+#    - Low priority: 1-2 retries
+
+# 3. Timeout Values:
+#    - Fast services: 5 seconds
+#    - Standard: 10 seconds
+#    - Slow services: 15-30 seconds
+
+# 4. Notification Strategy:
+#    - Critical → Multiple channels (Email + Webhook + SMS)
+#    - Warning → Email + Webhook
+#    - Info → Webhook only (for logging)
+
+# 5. Tag Organization:
+#    - Use consistent tag naming
+#    - Combine severity + category
+#    - Create groups in status pages
+
+# 6. Certificate Monitoring:
+#    - Check daily (86400 interval)
+#    - Alert 30 days before expiry
+#    - Critical alert at 15 days
+
+---
+# NOTES
+---
+
+# - This file is a reference template. Copy configurations to Uptime Kuma UI.
+# - Adjust intervals and timeouts based on your needs.
+# - Test notifications before enabling for production.
+# - Use maintenance windows during known downtime.
+# - Monitor the monitor (Uptime Kuma itself).
+# - Regular reviews of alert accuracy (reduce false positives).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
