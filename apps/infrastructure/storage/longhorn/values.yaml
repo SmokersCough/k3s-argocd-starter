@@ -21,50 +21,6 @@ global:
         taintToleration: cattle.io/os=linux:NoSchedule
         systemManagedComponentsNodeSelector: kubernetes.io/os:linux
 
-image:
-  longhorn:
-    engine:
-      repository: longhornio/longhorn-engine
-      tag: v1.9.0
-    manager:
-      repository: longhornio/longhorn-manager
-      tag: v1.9.0
-    ui:
-      repository: longhornio/longhorn-ui
-      tag: v1.9.0
-    instanceManager:
-      repository: longhornio/longhorn-instance-manager
-      tag: v1.9.0
-    shareManager:
-      repository: longhornio/longhorn-share-manager
-      tag: v1.9.0
-    backingImageManager:
-      repository: longhornio/backing-image-manager
-      tag: v1.9.0
-    supportBundleKit:
-      repository: longhornio/support-bundle-kit
-      tag: v0.0.24
-  csi:
-    attacher:
-      repository: longhornio/csi-attacher
-      tag: v4.8.1
-    provisioner:
-      repository: longhornio/csi-provisioner
-      tag: v5.2.0
-    nodeDriverRegistrar:
-      repository: longhornio/csi-node-driver-registrar
-      tag: v2.13.0
-    resizer:
-      repository: longhornio/csi-resizer
-      tag: v1.13.2
-    snapshotter:
-      repository: longhornio/csi-snapshotter
-      tag: v8.2.0
-    livenessProbe:
-      repository: longhornio/livenessprobe
-      tag: v2.15.0
-  pullPolicy: IfNotPresent
-
 service:
   ui:
     type: ClusterIP
@@ -214,7 +170,7 @@ longhornDriver:
       memory: 512Mi
 
 longhornUI:
-  replicas: 2
+  replicas: 3
   priorityClass: ~
   tolerations: []
   nodeSelector: {}
