@@ -24,6 +24,8 @@ spec:
     spec:
       project: infrastructure
       source:
+        plugin:
+          name: kustomize-build-with-helm
         repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
         targetRevision: HEAD
         path: '{{path}}'
