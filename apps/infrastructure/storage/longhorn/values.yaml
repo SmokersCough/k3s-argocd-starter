@@ -1,22 +1,16 @@
-# Default values for longhorn.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+# Longhorn values.yaml for ArgoCD (compatible with kustomize-build-with-helm)
 global:
   cattle:
     systemDefaultRegistry: ""
     windowsCluster:
-      # Enable this to allow Longhorn to run on the Rancher deployed Windows cluster
       enabled: false
-      # Tolerate Linux node taint
       tolerations:
       - key: "cattle.io/os"
         value: "linux"
         effect: "NoSchedule"
         operator: "Equal"
-      # Select Linux nodes
       nodeSelector:
         kubernetes.io/os: "linux"
-      # Recognize toleration and node selector for Longhorn run-time created components
       defaultSetting:
         taintToleration: cattle.io/os=linux:NoSchedule
         systemManagedComponentsNodeSelector: kubernetes.io/os:linux
@@ -24,12 +18,8 @@ global:
 service:
   ui:
     type: ClusterIP
-    nodePort: null
   manager:
     type: ClusterIP
-    nodePort: ""
-    loadBalancerIP: ""
-    loadBalancerSourceRanges: ""
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9500"
@@ -38,23 +28,17 @@ persistence:
   defaultClass: true
   defaultFsType: ext4
   defaultMkfsParams: "-O ^has_journal,extent,uninit_bg -E lazy_itable_init=0,lazy_journal_init=0"
-  defaultClassReplicaCount: 2  # Optimized for 2 worker nodes
+  defaultClassReplicaCount: 2
   defaultDataLocality: disabled
   defaultReplicaAutoBalance: least-effort
   reclaimPolicy: Delete
   migratable: false
   recurringJobSelector:
     enable: false
-    jobList: []
   backingImage:
     enable: false
-    name: ~
-    dataSourceType: ~
-    dataSourceParameters: ~
-    expectedChecksum: ~
   defaultNodeSelector:
     enable: false
-    selector: []
   removeSnapshotsDuringFilesystemTrim: disabled
 
 csi:
@@ -79,16 +63,16 @@ csi:
       memory: 256Mi
 
 defaultSettings:
-  backupTarget: ~
-  backupTargetCredentialSecret: ~
+  backupTarget: ""
+  backupTargetCredentialSecret: ""
   allowRecurringJobWhileVolumeDetached: true
   createDefaultDiskLabeledNodes: true
   defaultDataPath: /var/lib/longhorn
   defaultDataLocality: disabled
   replicaSoftAntiAffinity: true
   replicaAutoBalance: least-effort
-  storageOverProvisioningPercentage: 200
-  storageMinimalAvailablePercentage: 10
+  storageOverProvisioningPercentage: "200"  # MUST be string
+  storageMinimalAvailablePercentage: "10"   # MUST be string
   upgradeChecker: true
   defaultReplicaCount: 2
   defaultLonghornStaticStorageClass: longhorn-static
@@ -98,9 +82,6 @@ defaultSettings:
   recurringSuccessfulJobsHistoryLimit: 3
   recurringFailedJobsHistoryLimit: 3
   supportBundleFailedHistoryLimit: 3
-  taintToleration: ~
-  systemManagedComponentsNodeSelector: ~
-  priorityClass: ~
   autoSalvage: true
   autoDeletePodWhenVolumeDetachedUnexpectedly: true
   disableSchedulingOnCordonedNode: true
@@ -124,15 +105,13 @@ defaultSettings:
   guaranteedInstanceManagerCPU: 0.25
   kubernetesClusterAutoscalerEnabled: false
   orphanAutoDeletion: true
-  storageNetwork: ~
-  deletingConfirmationFlag: ~
+  storageNetwork: ""
+  deletingConfirmationFlag: ""
   engineReplicaTimeout: 8
   snapshotDataIntegrity: disabled
-  snapshotDataIntegrityImmediateCheckAfterSnapshotCreation: false
-  snapshotDataIntegrityCronjob: ~
-  removeSnapshotsDuringFilesystemTrim: disabled
   fastReplicaRebuildEnabled: true
   replicaFileSyncHttpClientTimeout: 30
+
 privateRegistry:
   createSecret: true
   registryUrl: docker.io
@@ -142,12 +121,9 @@ privateRegistry:
 
 longhornManager:
   log:
-    ## Allowed values are `plain` or `json`.
     format: plain
-  priorityClass: ~
   tolerations: []
   nodeSelector: {}
-  serviceAnnotations: {}
   resources:
     requests:
       cpu: 250m
@@ -155,10 +131,8 @@ longhornManager:
     limits:
       cpu: 500m
       memory: 512Mi
-  args: []
 
 longhornDriver:
-  priorityClass: ~
   tolerations: []
   nodeSelector: {}
   resources:
@@ -171,7 +145,6 @@ longhornDriver:
 
 longhornUI:
   replicas: 3
-  priorityClass: ~
   tolerations: []
   nodeSelector: {}
   resources:
@@ -184,42 +157,12 @@ longhornUI:
 
 longhornConversionWebhook:
   replicas: 2
-  priorityClass: ~
-  tolerations: []
-  nodeSelector: {}
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
 
 longhornAdmissionWebhook:
   replicas: 2
-  priorityClass: ~
-  tolerations: []
-  nodeSelector: {}
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
 
 longhornRecoveryBackend:
   replicas: 2
-  priorityClass: ~
-  tolerations: []
-  nodeSelector: {}
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 200m
-      memory: 256Mi
 
 ingress:
   enabled: true
@@ -232,11 +175,3 @@ ingress:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/cluster-issuer: letsencrypt-prod
-  secrets: []
-
-enablePSP: false
-namespaceOverride: ""
-annotations: {}
-
-serviceAccount:
-  annotations: {}
