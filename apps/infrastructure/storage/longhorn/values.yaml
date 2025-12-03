@@ -1,4 +1,3 @@
-# Longhorn values.yaml for ArgoCD (compatible with kustomize-build-with-helm)
 global:
   cattle:
     systemDefaultRegistry: ""
@@ -18,8 +17,12 @@ global:
 service:
   ui:
     type: ClusterIP
+    nodePort: null
   manager:
     type: ClusterIP
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: ""
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "9500"
@@ -28,17 +31,23 @@ persistence:
   defaultClass: true
   defaultFsType: ext4
   defaultMkfsParams: "-O ^has_journal,extent,uninit_bg -E lazy_itable_init=0,lazy_journal_init=0"
-  defaultClassReplicaCount: 2
+  defaultClassReplicaCount: "2"  # string for chart
   defaultDataLocality: disabled
   defaultReplicaAutoBalance: least-effort
   reclaimPolicy: Delete
   migratable: false
   recurringJobSelector:
     enable: false
+    jobList: []
   backingImage:
     enable: false
+    name: ~
+    dataSourceType: ~
+    dataSourceParameters: ~
+    expectedChecksum: ~
   defaultNodeSelector:
     enable: false
+    selector: []
   removeSnapshotsDuringFilesystemTrim: disabled
 
 csi:
@@ -63,25 +72,28 @@ csi:
       memory: 256Mi
 
 defaultSettings:
-  backupTarget: ""
-  backupTargetCredentialSecret: ""
+  backupTarget: ~
+  backupTargetCredentialSecret: ~
   allowRecurringJobWhileVolumeDetached: true
   createDefaultDiskLabeledNodes: true
   defaultDataPath: /var/lib/longhorn
   defaultDataLocality: disabled
   replicaSoftAntiAffinity: true
   replicaAutoBalance: least-effort
-  storageOverProvisioningPercentage: "200"  # MUST be string
-  storageMinimalAvailablePercentage: "10"   # MUST be string
+  storageOverProvisioningPercentage: "200"  # string
+  storageMinimalAvailablePercentage: "10"   # string
   upgradeChecker: true
-  defaultReplicaCount: 2
+  defaultReplicaCount: "2"                   # string
   defaultLonghornStaticStorageClass: longhorn-static
-  backupstorePollInterval: 300
-  failedBackupTTL: 1440
+  backupstorePollInterval: "300"            # string
+  failedBackupTTL: "1440"                   # string
   restoreVolumeRecurringJobs: true
-  recurringSuccessfulJobsHistoryLimit: 3
-  recurringFailedJobsHistoryLimit: 3
-  supportBundleFailedHistoryLimit: 3
+  recurringSuccessfulJobsHistoryLimit: "3"  # string
+  recurringFailedJobsHistoryLimit: "3"      # string
+  supportBundleFailedHistoryLimit: "3"      # string
+  taintToleration: ~
+  systemManagedComponentsNodeSelector: ~
+  priorityClass: ~
   autoSalvage: true
   autoDeletePodWhenVolumeDetachedUnexpectedly: true
   disableSchedulingOnCordonedNode: true
@@ -90,27 +102,30 @@ defaultSettings:
   allowNodeDrainWithLastHealthyReplica: true
   mkfsExt4Parameters: -O ^has_journal,extent,uninit_bg -E lazy_itable_init=0,lazy_journal_init=0
   disableReplicaRebuild: false
-  replicaReplenishmentWaitInterval: 600
-  concurrentReplicaRebuildPerNodeLimit: 2
-  concurrentVolumeBackupRestorePerNodeLimit: 2
+  replicaReplenishmentWaitInterval: "600"        # string
+  concurrentReplicaRebuildPerNodeLimit: "2"      # string
+  concurrentVolumeBackupRestorePerNodeLimit: "2" # string
   disableRevisionCounter: false
   systemManagedPodsImagePullPolicy: IfNotPresent
   allowVolumeCreationWithDegradedAvailability: true
   autoCleanupSystemGeneratedSnapshot: true
-  concurrentAutomaticEngineUpgradePerNodeLimit: 2
-  backingImageCleanupWaitInterval: 60
-  backingImageRecoveryWaitInterval: 300
+  concurrentAutomaticEngineUpgradePerNodeLimit: "2"  # string
+  backingImageCleanupWaitInterval: "60"             # string
+  backingImageRecoveryWaitInterval: "300"           # string
   guaranteedEngineManagerCPU: 0.25
   guaranteedReplicaManagerCPU: 0.25
   guaranteedInstanceManagerCPU: 0.25
   kubernetesClusterAutoscalerEnabled: false
   orphanAutoDeletion: true
-  storageNetwork: ""
-  deletingConfirmationFlag: ""
-  engineReplicaTimeout: 8
+  storageNetwork: ~
+  deletingConfirmationFlag: ~
+  engineReplicaTimeout: "8"  # string
   snapshotDataIntegrity: disabled
+  snapshotDataIntegrityImmediateCheckAfterSnapshotCreation: false
+  snapshotDataIntegrityCronjob: ~
+  removeSnapshotsDuringFilesystemTrim: disabled
   fastReplicaRebuildEnabled: true
-  replicaFileSyncHttpClientTimeout: 30
+  replicaFileSyncHttpClientTimeout: "30"  # string
 
 privateRegistry:
   createSecret: true
@@ -122,8 +137,10 @@ privateRegistry:
 longhornManager:
   log:
     format: plain
+  priorityClass: ~
   tolerations: []
   nodeSelector: {}
+  serviceAnnotations: {}
   resources:
     requests:
       cpu: 250m
@@ -131,8 +148,10 @@ longhornManager:
     limits:
       cpu: 500m
       memory: 512Mi
+  args: []
 
 longhornDriver:
+  priorityClass: ~
   tolerations: []
   nodeSelector: {}
   resources:
@@ -145,6 +164,7 @@ longhornDriver:
 
 longhornUI:
   replicas: 3
+  priorityClass: ~
   tolerations: []
   nodeSelector: {}
   resources:
@@ -157,12 +177,42 @@ longhornUI:
 
 longhornConversionWebhook:
   replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 longhornAdmissionWebhook:
   replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 longhornRecoveryBackend:
   replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 ingress:
   enabled: true
@@ -175,3 +225,11 @@ ingress:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     cert-manager.io/cluster-issuer: letsencrypt-prod
+  secrets: []
+
+enablePSP: false
+namespaceOverride: ""
+annotations: {}
+
+serviceAccount:
+  annotations: {}
