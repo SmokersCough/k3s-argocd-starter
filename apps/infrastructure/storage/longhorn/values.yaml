@@ -216,8 +216,8 @@ longhornRecoveryBackend:
       cpu: "200m"
       memory: "256Mi"
 
-# ingress:
-#   enabled: "true"
+ ingress:
+   enabled: "false"
 # ingressClassName: "traefik"
 #  host: "longhorn.local"
 #  tls: "true"
