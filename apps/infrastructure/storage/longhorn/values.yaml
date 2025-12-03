@@ -216,18 +216,18 @@ longhornRecoveryBackend:
       cpu: "200m"
       memory: "256Mi"
 
-ingress:
-  enabled: "true"
-  ingressClassName: "traefik"
-  host: "longhorn.local"
-  tls: "true"
-  secureBackends: "true"
-  tlsSecret: "longhorn.local-tls"
-  path: "/"
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-  secrets: []
+# ingress:
+#   enabled: "true"
+# ingressClassName: "traefik"
+#  host: "longhorn.local"
+#  tls: "true"
+#  secureBackends: "true"
+#  tlsSecret: "longhorn.local-tls"
+#  path: "/"
+#  annotations:
+#    traefik.ingress.kubernetes.io/router.entrypoints: "websecure"
+#    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+#  secrets: []
 
 enablePSP: "false"
 namespaceOverride: ""
