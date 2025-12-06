@@ -1,5 +1,10 @@
 # Default values for longhorn.
 
+# Disable preUpgradeChecker for ArgoCD compatibility
+# See: https://longhorn.io/docs/1.10.1/deploy/install/install-with-argocd/
+preUpgradeChecker:
+  jobEnabled: false
+
 global:
   cattle:
     systemDefaultRegistry: ""
