@@ -24,28 +24,30 @@ spec:
               echo "Checking cert-manager pods..."
               kubectl get pods -n cert-manager -l app.kubernetes.io/name=cert-manager
 
-              # Check if ClusterIssuer is ready
+              # Check if ClusterIssuers are ready
               echo "Checking ClusterIssuer status..."
-              kubectl get clusterissuer cloudflare-cluster-issuer -o wide
+              kubectl get clusterissuer letsencrypt-http01 letsencrypt-staging letsencrypt-prod -o wide
 
               # Check if the secret exists
               echo "Checking Cloudflare secret..."
-              if kubectl get secret cloudflare-api-token -n cert-manager > /dev/null 2>&1; then
+              if kubectl get secret cloudflare-api-token-secret -n cert-manager > /dev/null 2>&1; then
                 echo "✓ Cloudflare API token secret exists"
               else
                 echo "✗ Cloudflare API token secret missing!"
-                echo "Create it with: kubectl create secret generic cloudflare-api-token --from-literal=api-token=YOUR_TOKEN -n cert-manager"
+                echo "Create it with: kubectl create secret generic cloudflare-api-token-secret --from-literal=api-token=YOUR_TOKEN -n cert-manager"
                 exit 1
               fi
 
-              # Check if ClusterIssuer is ready
-              if kubectl get clusterissuer cloudflare-cluster-issuer -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
-                echo "✓ ClusterIssuer is ready"
-              else
-                echo "✗ ClusterIssuer is not ready"
-                kubectl describe clusterissuer cloudflare-cluster-issuer
-                exit 1
-              fi
+              # Check if ClusterIssuers are ready
+              for issuer in letsencrypt-http01 letsencrypt-staging letsencrypt-prod; do
+                if kubectl get clusterissuer $issuer -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
+                  echo "✓ ClusterIssuer $issuer is ready"
+                else
+                  echo "✗ ClusterIssuer $issuer is not ready"
+                  kubectl describe clusterissuer $issuer
+                  exit 1
+                fi
+              done
 
               echo "=== cert-manager validation completed successfully ==="
       serviceAccountName: cert-manager-validation
