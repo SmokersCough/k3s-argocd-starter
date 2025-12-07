@@ -16,15 +16,5 @@ helmCharts:
     valuesFile: values.yaml
     includeCRDs: true
 
-# Remove the Helm-generated ingress so it doesn't collide with yours
-patches:
-  - target:
-      group: networking.k8s.io
-      version: v1
-      kind: Ingress
-      name: longhorn-ingress
-    patch: |
-      $patch: delete
-
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
