@@ -11,8 +11,11 @@ spec:
     targetRevision: 1.10.1
     helm:
       releaseName: longhorn
-      valuesFiles:
-        - values.yaml  # Make sure this file is in your repo or accessible
+      values: |
+        preUpgradeChecker:
+          jobEnabled: false
+        ingress:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
@@ -22,3 +25,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+
