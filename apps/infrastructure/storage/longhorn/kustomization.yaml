@@ -5,7 +5,7 @@ namespace: longhorn-system
 
 resources:
   - namespace.yaml
-  # - ingress.yaml
+  - ingress.yaml
 
 helmCharts:
   - name: longhorn
@@ -15,6 +15,9 @@ helmCharts:
     namespace: longhorn-system
     valuesFile: values.yaml
     includeCRDs: true
+
+patches:
+  - path: delete-helm-ingress.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
