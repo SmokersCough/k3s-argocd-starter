@@ -8,10 +8,11 @@ spec:
   source:
     repoURL: https://charts.longhorn.io
     chart: longhorn
-    targetRevision: v1.10.1
+    targetRevision: 1.10.1
     helm:
+      releaseName: longhorn
       valuesFiles:
-        - values.yaml
+        - values.yaml  # Make sure this file is in your repo or accessible
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
