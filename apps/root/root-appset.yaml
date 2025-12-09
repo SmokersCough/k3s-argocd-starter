@@ -11,7 +11,7 @@ spec:
       repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
       revision: HEAD
       directories:
-      - path: apps/monitoring/kube-prometheus-stack/
+      - path: apps/monitoring/kube-prometheus-stack/*
       - path: apps/applications/*
       - path: apps/infrastructure/controllers/*
       - path: apps/infrastructure/networking/*
