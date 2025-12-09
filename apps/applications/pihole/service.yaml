@@ -6,7 +6,7 @@ metadata:
   labels:
     app: pihole-primary
   annotations:
-    kube-vip.io/loadbalancerIPs: ""
+    metallb.universe.tf/loadBalancerIPs: "192.168.50.81"
 spec:
   type: LoadBalancer
   ports:
@@ -33,7 +33,7 @@ metadata:
   labels:
     app: pihole-secondary
   annotations:
-    kube-vip.io/loadbalancerIPs: ""
+    metallb.universe.tf/loadBalancerIPs: "192.168.50.82"
 spec:
   type: LoadBalancer
   ports:
