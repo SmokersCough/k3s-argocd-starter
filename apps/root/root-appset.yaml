@@ -16,7 +16,6 @@ spec:
       - path: apps/infrastructure/controllers/*
       - path: apps/infrastructure/networking/*
       - path: apps/infrastructure/storage/*
-        exclude: apps/infrastructure/storage/longhorn
   template:
     metadata:
       name: '{{path.basename}}'
