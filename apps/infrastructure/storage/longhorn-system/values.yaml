@@ -1,21 +1,242 @@
-preUpgradeChecker:
-  jobEnabled: false
+# Default values for longhorn.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  cattle:
+    systemDefaultRegistry: ""
+    windowsCluster:
+      # Enable this to allow Longhorn to run on the Rancher deployed Windows cluster
+      enabled: false
+      # Tolerate Linux node taint
+      tolerations:
+      - key: "cattle.io/os"
+        value: "linux"
+        effect: "NoSchedule"
+        operator: "Equal"
+      # Select Linux nodes
+      nodeSelector:
+        kubernetes.io/os: "linux"
+      # Recognize toleration and node selector for Longhorn run-time created components
+      defaultSetting:
+        taintToleration: cattle.io/os=linux:NoSchedule
+        systemManagedComponentsNodeSelector: kubernetes.io/os:linux
 
 service:
   ui:
     type: ClusterIP
+    nodePort: null
+  manager:
+    type: ClusterIP
+    nodePort: ""
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: ""
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "9500"
 
 persistence:
   defaultClass: true
+  defaultFsType: ext4
+  defaultMkfsParams: "-O ^has_journal,extent,uninit_bg -E lazy_itable_init=0,lazy_journal_init=0"
+  defaultClassReplicaCount: 2  # Optimized for 2 worker nodes
+  defaultDataLocality: disabled
+  defaultReplicaAutoBalance: least-effort
+  reclaimPolicy: Delete
+  migratable: false
+  recurringJobSelector:
+    enable: false
+    jobList: []
+  backingImage:
+    enable: false
+    name: ~
+    dataSourceType: ~
+    dataSourceParameters: ~
+    expectedChecksum: ~
+  defaultNodeSelector:
+    enable: false
+    selector: []
+  removeSnapshotsDuringFilesystemTrim: disabled
+
+csi:
+  kubeletRootDir: /var/lib/kubelet
+  attacherReplicaCount: 2
+  provisionerReplicaCount: 2
+  resizerReplicaCount: 2
+  snapshotterReplicaCount: 2
+  livenessProbe:
+    enabled: true
+    port: 9808
+    probePeriodSeconds: 10
+    probeTimeoutSeconds: 3
+    failureThreshold: 3
+    initialDelaySeconds: 10
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 defaultSettings:
-  storageOverProvisioningPercentage: 200
-  defaultReplicaCount: 2
-  orphanAutoDeletion: true
+  backupTarget: ~
+  backupTargetCredentialSecret: ~
+  allowRecurringJobWhileVolumeDetached: true
+  createDefaultDiskLabeledNodes: true
+  defaultDataPath: /var/lib/longhorn
+  defaultDataLocality: disabled
   replicaSoftAntiAffinity: true
-  defaultLonghornStaticStorageClass: "longhorn-static"
+  replicaAutoBalance: least-effort
+  storageOverProvisioningPercentage: 200
+  storageMinimalAvailablePercentage: 10
+  upgradeChecker: true
+  defaultReplicaCount: 2
+  defaultLonghornStaticStorageClass: longhorn-static
+  backupstorePollInterval: 300
+  failedBackupTTL: 1440
+  restoreVolumeRecurringJobs: true
+  recurringSuccessfulJobsHistoryLimit: 3
+  recurringFailedJobsHistoryLimit: 3
+  supportBundleFailedHistoryLimit: 3
+  taintToleration: ~
+  systemManagedComponentsNodeSelector: ~
+  priorityClass: ~
+  autoSalvage: true
+  autoDeletePodWhenVolumeDetachedUnexpectedly: true
+  disableSchedulingOnCordonedNode: true
+  replicaZoneSoftAntiAffinity: true
+  nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
+  allowNodeDrainWithLastHealthyReplica: true
+  mkfsExt4Parameters: -O ^has_journal,extent,uninit_bg -E lazy_itable_init=0,lazy_journal_init=0
+  disableReplicaRebuild: false
+  replicaReplenishmentWaitInterval: 600
+  concurrentReplicaRebuildPerNodeLimit: 2
+  concurrentVolumeBackupRestorePerNodeLimit: 2
+  disableRevisionCounter: false
+  systemManagedPodsImagePullPolicy: IfNotPresent
+  allowVolumeCreationWithDegradedAvailability: true
+  autoCleanupSystemGeneratedSnapshot: true
+  concurrentAutomaticEngineUpgradePerNodeLimit: 2
+  backingImageCleanupWaitInterval: 60
+  backingImageRecoveryWaitInterval: 300
+  guaranteedEngineManagerCPU: 0.25
+  guaranteedReplicaManagerCPU: 0.25
+  guaranteedInstanceManagerCPU: 0.25
+  kubernetesClusterAutoscalerEnabled: false
+  orphanAutoDeletion: true
+  storageNetwork: ~
+  deletingConfirmationFlag: ~
+  engineReplicaTimeout: 8
+  snapshotDataIntegrity: disabled
+  snapshotDataIntegrityImmediateCheckAfterSnapshotCreation: false
+  snapshotDataIntegrityCronjob: ~
+  removeSnapshotsDuringFilesystemTrim: disabled
+  fastReplicaRebuildEnabled: true
+  replicaFileSyncHttpClientTimeout: 30
+privateRegistry:
+  createSecret: true
+  registryUrl: docker.io
+  registryUser: ""
+  registryPasswd: ""
+  registrySecret: ""
+
+longhornManager:
+  log:
+    ## Allowed values are `plain` or `json`.
+    format: plain
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  serviceAnnotations: {}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  args: []
+
+longhornDriver:
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+longhornUI:
+  replicas: 3
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+longhornConversionWebhook:
+  replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+longhornAdmissionWebhook:
+  replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+longhornRecoveryBackend:
+  replicas: 2
+  priorityClass: ~
+  tolerations: []
+  nodeSelector: {}
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
 
 ingress:
-  enabled: false
+  enabled: true
+  ingressClassName: traefik
+  host: longhorn.local
+  tls: true
+  secureBackends: true
+  tlsSecret: longhorn.local-tls
+  path: /
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  secrets: []
 
 enablePSP: false
+namespaceOverride: ""
+annotations: {}
+
+serviceAccount:
+  annotations: {}
