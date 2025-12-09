@@ -115,3 +115,7 @@ persistence:
 # Pod priority
 priorityClassName: "system-cluster-critical"
 
+# Disable dashboard IngressRoute (we use standard Kubernetes Ingress)
+dashboard:
+  enabled: false
+
