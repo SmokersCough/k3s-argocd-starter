@@ -429,11 +429,8 @@ metrics:
       annotations: {}
     # -- When set to true, it won't check if Prometheus Operator CRDs are deployed
     disableAPICheck: true  # @schema type:[boolean, null]
-    prometheusRule:
-      # -- Enable optional CR for Prometheus Operator. See EXAMPLES.md for more details.
-      enabled: false
-      additionalLabels: {}
-      namespace: ""
+    # Disable PrometheusRule completely to avoid invalid null spec
+    prometheusRule: null
 
   #  datadog:
   #    ## Address instructs exporter to send metrics to datadog-agent at this address.
