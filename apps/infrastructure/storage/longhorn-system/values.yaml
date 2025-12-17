@@ -222,7 +222,7 @@ longhornRecoveryBackend:
       memory: 256Mi
 
 ingress:
-  enabled: true
+  enabled: false  # Disabled - using custom ingress.yaml instead
   ingressClassName: traefik
   host: longhorn.local
   tls: true
