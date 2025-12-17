@@ -82,7 +82,7 @@ defaultSettings:
   backupTarget: ~
   backupTargetCredentialSecret: ~
   allowRecurringJobWhileVolumeDetached: true
-  createDefaultDiskLabeledNodes: true
+  createDefaultDiskLabeledNodes: false  # Set to false to create disks on all nodes automatically
   defaultDataPath: /var/lib/longhorn
   defaultDataLocality: disabled
   replicaSoftAntiAffinity: true
