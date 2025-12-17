@@ -234,6 +234,9 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   secrets: []
 
+preUpgradeChecker:
+  jobEnabled: false  # Disable pre-upgrade checker to prevent ArgoCD sync issues
+
 enablePSP: false
 namespaceOverride: ""
 annotations: {}
