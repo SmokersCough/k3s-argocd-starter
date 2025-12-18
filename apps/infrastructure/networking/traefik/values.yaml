@@ -821,7 +821,7 @@ service:
 autoscaling:  # @schema additionalProperties: false
   # -- Create HorizontalPodAutoscaler object.
   # See EXAMPLES.md for more details.
-  enabled: true
+  enabled: false
   # -- minReplicas is the lower limit for the number of replicas to which the autoscaler can scale down. It defaults to 1 pod.
   minReplicas: 2
   # -- maxReplicas is the upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.
