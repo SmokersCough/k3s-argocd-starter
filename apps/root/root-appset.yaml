@@ -12,6 +12,7 @@ spec:
       revision: HEAD
       directories:
       - path: apps/monitoring/kube-prometheus-stack/*
+      - path: apps/monitoring/kube-prometheus-stack/kustomization.yaml
       - path: apps/applications/*
       - path: apps/infrastructure/controllers/*
       - path: apps/infrastructure/networking/*
