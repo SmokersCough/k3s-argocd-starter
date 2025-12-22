@@ -1,10 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: kube-prometheus-stack
+namespace: monitoring
 
 resources:
+- values.yaml
 - namespace.yaml
+- dashboards/k3s-cluster-overview-configmap.yaml
+- dashboards/dashboard-16450-configmap.yaml
 
 helmCharts:
 - name: kube-prometheus-stack
