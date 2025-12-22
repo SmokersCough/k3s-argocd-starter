@@ -9,7 +9,7 @@ resources:
   - n8n-ingress-traefik.yaml
   - n8n-pvc.yaml
   - n8n-secrets.yaml
-  - n8n-secrets-generated.yaml
+  
 
   # Optional generic ingress
   #- ingress.yaml
@@ -19,4 +19,4 @@ resources:
   - postgres-service.yaml
   - postgres-pvc.yaml
   - postgres-secrets.yaml
-  - postgres-secrets-generated.yaml
+  
