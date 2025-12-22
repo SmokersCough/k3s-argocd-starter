@@ -5,8 +5,7 @@ namespace: kube-prometheus-stack
 
 resources:
 - namespace.yaml
-- http-route-grafana.yaml
-- http-route-prometheus.yaml
+- values.yaml
 - dashboards/k3s-cluster-overview-configmap.yaml
 - dashboards/dashboard-16450-configmap.yaml
 
