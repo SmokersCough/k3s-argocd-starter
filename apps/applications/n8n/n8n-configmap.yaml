@@ -10,7 +10,7 @@ metadata:
 data:
   # Environment
   NODE_ENV: "production"
-  GENERIC_TIMEZONE: "Europe/Warsaw"
+  GENERIC_TIMEZONE: "America/New_York"
   
   # URLs and Webhooks
   WEBHOOK_URL: "https://n8n.katrelleslab.org/"

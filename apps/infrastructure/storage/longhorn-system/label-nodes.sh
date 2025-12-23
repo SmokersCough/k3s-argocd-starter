@@ -29,3 +29,6 @@ echo ""
 echo "Longhorn will automatically create default disks on these nodes."
 echo "Default disk path: /var/lib/longhorn"
 
+
+
+

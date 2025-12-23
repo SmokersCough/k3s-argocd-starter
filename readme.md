@@ -296,9 +296,9 @@ You'll need to create two secrets for Cloudflare integration:
 # 6. Copy the token and your Cloudflare account email
 
 # Set credentials - NEVER COMMIT THESE!
-export CLOUDFLARE_API_TOKEN=""
-export CLOUDFLARE_EMAIL=""
-export DOMAIN=""
+export CLOUDFLARE_API_TOKEN="K8-tmFQxsSh2AMuFxPB4BK45UvouWNj44TskfinG"
+export CLOUDFLARE_EMAIL="katrelleprunty@icloud.com"
+export DOMAIN="katrelleslab.org"
 export TUNNEL_NAME="k3s-cluster"  # Must match config.yaml
 ```
 
@@ -343,7 +343,7 @@ cloudflared tunnel route dns $TUNNEL_ID "*.$DOMAIN"
 ```bash
 # Create cert-manager secrets
 kubectl create namespace cert-manager
-kubectl create secret generic cloudflare-api-token -n cert-manager \
+kubectl create secret generic cloudflare-api-token-secret -n cert-manager \
   --from-literal=api-token=$CLOUDFLARE_API_TOKEN \
   --from-literal=email=$CLOUDFLARE_EMAIL
 
