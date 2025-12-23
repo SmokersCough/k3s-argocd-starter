@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: root-controllers
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+spec:
+  generators:
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
+          - path: apps/infrastructure/controllers/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: infrastructure
+      source:
+        plugin:
+          name: kustomize-build-with-helm
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{path.basename}}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true

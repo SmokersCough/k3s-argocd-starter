@@ -3,38 +3,42 @@ kind: ApplicationSet
 metadata:
   name: root
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
 spec:
   generators:
+    # Storage first
     - git:
         repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
         revision: HEAD
         directories:
-          # --- Storage first ---
           - path: apps/infrastructure/storage/*
-            variables:
-              wave: "-3"
 
-          # --- Controllers second ---
+    # Controllers second
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
           - path: apps/infrastructure/controllers/*
-            variables:
-              wave: "-2"
 
-          # --- Networking third ---
+    # Networking third
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
           - path: apps/infrastructure/networking/*
-            variables:
-              wave: "-1"
 
-          # --- Monitoring before apps if you want ---
+    # Monitoring next
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
           - path: apps/monitoring/kube-prometheus-stack/*
-            variables:
-              wave: "0"
 
-          # --- Applications last ---
+    # Applications last
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
           - path: apps/applications/*
-            variables:
-              wave: "1"
 
   template:
     metadata:
@@ -42,7 +46,9 @@ spec:
       labels:
         type: appset-manager
       annotations:
-        argocd.argoproj.io/sync-wave: '{{wave}}'
+        # This assigns waves based on path patterns
+        argocd.argoproj.io/sync-wave: |
+          {{- if contains "storage" .path }}-3{{- else if contains "controllers" .path }}-2{{- else if contains "networking" .path }}-1{{- else if contains "monitoring" .path }}0{{- else }}1{{- end }}
     spec:
       project: infrastructure
       source:
