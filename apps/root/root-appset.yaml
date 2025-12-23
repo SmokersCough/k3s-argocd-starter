@@ -7,20 +7,42 @@ metadata:
     argocd.argoproj.io/sync-wave: "-1"
 spec:
   generators:
-  - git:
-      repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
-      revision: HEAD
-      directories:
-      - path: apps/monitoring/kube-prometheus-stack/*
-      - path: apps/applications/*
-      - path: apps/infrastructure/controllers/*
-      - path: apps/infrastructure/networking/*
-      - path: apps/infrastructure/storage/*
+    - git:
+        repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
+        revision: HEAD
+        directories:
+          # --- Storage first ---
+          - path: apps/infrastructure/storage/*
+            variables:
+              wave: "-3"
+
+          # --- Controllers second ---
+          - path: apps/infrastructure/controllers/*
+            variables:
+              wave: "-2"
+
+          # --- Networking third ---
+          - path: apps/infrastructure/networking/*
+            variables:
+              wave: "-1"
+
+          # --- Monitoring before apps if you want ---
+          - path: apps/monitoring/kube-prometheus-stack/*
+            variables:
+              wave: "0"
+
+          # --- Applications last ---
+          - path: apps/applications/*
+            variables:
+              wave: "1"
+
   template:
     metadata:
       name: '{{path.basename}}'
       labels:
         type: appset-manager
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{wave}}'
     spec:
       project: infrastructure
       source:
@@ -45,4 +67,3 @@ spec:
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
-
