@@ -36,7 +36,7 @@ spec:
           - -c
           - |
             echo "Removing Pi-hole password..."
-            pihole setpassword
+            printf "\n\n" | pihole -a -p || true
             echo "Password removal completed"
         volumeMounts:
         - name: pihole-config
@@ -148,7 +148,7 @@ spec:
           - -c
           - |
             echo "Removing Pi-hole password..."
-            pihole setpassword
+            printf "\n\n" | pihole -a -p || true
             echo "Password removal completed"
         volumeMounts:
         - name: pihole-config
@@ -252,9 +252,9 @@ spec:
         env:
           # Connection Settings
         - name: PRIMARY
-          value: "http://192.168.50.81|uv6OOv0V"
+          value: "http://192.168.50.81|"  # No password
         - name: REPLICAS
-          value: "http://192.168.50.82|iux-hibB"
+          value: "http://192.168.50.82|"  # No password
         - name: CLIENT_SKIP_TLS_VERIFICATION
           value: "true"
 
