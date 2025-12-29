@@ -15,6 +15,10 @@ spec:
   template:
     metadata:
       name: '{{path.basename}}'
+      labels:
+        appset: controllers
+      annotations:
+        argocd.argoproj.io/sync-wave: "-2"
     spec:
       project: infrastructure
       source:
@@ -27,9 +31,9 @@ spec:
         server: https://kubernetes.default.svc
         namespace: '{{path.basename}}'
       syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
+        # Note: Automated sync is disabled to ensure storage apps complete first
+        # Applications will be created but remain in "OutOfSync" until manually synced
+        # or enabled via script/hook after storage apps (wave -3) are healthy
         syncOptions:
           - CreateNamespace=true
           - ServerSideApply=true
