@@ -35,8 +35,16 @@ spec:
         args:
           - -c
           - |
-            echo "Removing Pi-hole password..."
-            printf "\n\n" | pihole -a -p || true
+            echo "Removing Pi-hole password from persistent storage..."
+            # Remove or empty WEBPASSWORD from setupVars.conf if it exists
+            if [ -f /etc/pihole/setupVars.conf ]; then
+              sed -i '/^WEBPASSWORD=/d' /etc/pihole/setupVars.conf
+              echo "WEBPASSWORD=" >> /etc/pihole/setupVars.conf
+            fi
+            # Also try to use pihole command to clear password if setupVars exists
+            if [ -f /etc/pihole/setupVars.conf ]; then
+              echo -e "\n" | pihole -a -p 2>/dev/null || true
+            fi
             echo "Password removal completed"
         volumeMounts:
         - name: pihole-config
@@ -147,8 +155,16 @@ spec:
         args:
           - -c
           - |
-            echo "Removing Pi-hole password..."
-            printf "\n\n" | pihole -a -p || true
+            echo "Removing Pi-hole password from persistent storage..."
+            # Remove or empty WEBPASSWORD from setupVars.conf if it exists
+            if [ -f /etc/pihole/setupVars.conf ]; then
+              sed -i '/^WEBPASSWORD=/d' /etc/pihole/setupVars.conf
+              echo "WEBPASSWORD=" >> /etc/pihole/setupVars.conf
+            fi
+            # Also try to use pihole command to clear password if setupVars exists
+            if [ -f /etc/pihole/setupVars.conf ]; then
+              echo -e "\n" | pihole -a -p 2>/dev/null || true
+            fi
             echo "Password removal completed"
         volumeMounts:
         - name: pihole-config

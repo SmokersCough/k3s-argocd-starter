@@ -5,7 +5,8 @@ metadata:
   namespace: pihole
 data:
   TZ: "America/New_York"
-  WEBPASSWORD: ""  # No password - Pi-hole will start without authentication
+  # WEBPASSWORD not set - Pi-hole will start without authentication
+  # If WEBPASSWORD is needed, it will be set to empty in setupVars.conf by initContainer
   DNSSEC: "true"
   DNS_BOGUS_PRIV: "true"
   DNSMASQ_LISTENING: "all"
@@ -23,7 +24,8 @@ metadata:
   namespace: pihole
 data:
   TZ: "UTC"
-  WEBPASSWORD: ""  # No password - Pi-hole will start without authentication
+  # WEBPASSWORD not set - Pi-hole will start without authentication
+  # If WEBPASSWORD is needed, it will be set to empty in setupVars.conf by initContainer
   DNSSEC: "true"
   DNS_BOGUS_PRIV: "true"
   DNSMASQ_LISTENING: "all"
