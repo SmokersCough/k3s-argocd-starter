@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: root-applications
+  name: root-monitoring
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -11,12 +11,12 @@ spec:
         repoURL: https://github.com/SmokersCough/k3s-argocd-starter.git
         revision: HEAD
         directories:
-          - path: apps/applications/*
+          - path: apps/monitoring/*
   template:
     metadata:
       name: '{{path.basename}}'
       labels:
-        appset: applications
+        appset: monitoring
       annotations:
         argocd.argoproj.io/sync-wave: "0"
     spec:

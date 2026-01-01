@@ -5,4 +5,5 @@ resources:
   - storage-appset.yaml
   - controllers-appset.yaml
   - networking-appset.yaml
+  - monitoring-appset.yaml
   - applications-appset.yaml  
