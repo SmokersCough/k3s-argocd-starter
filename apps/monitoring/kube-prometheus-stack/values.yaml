@@ -205,6 +205,8 @@ prometheusOperator:
     limits:
       cpu: 50m
       memory: 200Mi
+  admissionWebhooks:
+    enabled: false
 
 prometheus:
   enabled: true
