@@ -4,10 +4,9 @@ kind: Kustomization
 namespace: monitoring
 
 resources:
-- values.yaml
 - namespace.yaml
-- dashboards/k3s-cluster-overview-configmap.yaml
-- dashboards/dashboard-16450-configmap.yaml
+- k3s-cluster-overview-configmap.yaml
+- dashboard-16450-configmap.yaml
 
 helmCharts:
 - name: kube-prometheus-stack
