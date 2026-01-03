@@ -7,6 +7,7 @@ resources:
 - namespace.yaml
 - k3s-cluster-overview-configmap.yaml
 - dashboard-16450-configmap.yaml
+- Ingress.yaml
 
 helmCharts:
 - name: kube-prometheus-stack
