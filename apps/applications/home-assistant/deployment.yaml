@@ -22,9 +22,9 @@ spec:
         app.kubernetes.io/component: automation
     spec:
       securityContext:
-        fsGroup: 1000
-        runAsUser: 1000
-        runAsNonRoot: true
+        fsGroup: 0
+        runAsUser: 0
+        runAsNonRoot: false
       containers:
       - name: home-assistant
         image: homeassistant/home-assistant:latest
@@ -39,8 +39,8 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           readOnlyRootFilesystem: false
-          runAsNonRoot: true
-          runAsUser: 1000
+          runAsNonRoot: false
+          runAsUser: 0
           capabilities:
             drop:
             - ALL
