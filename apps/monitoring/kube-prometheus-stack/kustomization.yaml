@@ -8,6 +8,10 @@ resources:
 - k3s-cluster-overview-configmap.yaml
 - dashboard-16450-configmap.yaml
 - Ingress.yaml
+- endpoints-kube-controller-manager.yaml
+- endpoints-kube-etcd.yaml
+- endpoints-kube-scheduler.yaml
+- endpoints-kube-proxy.yaml
 
 helmCharts:
 - name: kube-prometheus-stack
