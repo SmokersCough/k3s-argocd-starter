@@ -14,7 +14,6 @@ resources:
 - postgres-secrets.yaml
 - postgres-service.yaml
 - postgres-statefulset.yaml
-- ingress.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
