@@ -2,6 +2,14 @@ configs:
   cm:
     create: true
     application.resourceTrackingMethod: "annotation+label"
+    resource.inclusions: |
+      # Allow Prometheus Endpoints for kube component monitoring
+      - apiGroups:
+        - ""
+        kinds:
+        - Endpoints
+        clusters:
+        - "*"
   cmp:
     create: true
     plugins:
