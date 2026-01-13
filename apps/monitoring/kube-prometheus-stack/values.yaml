@@ -78,11 +78,26 @@ grafana:
     targetPort: 3000
     annotations: {}
     labels: {}
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus-prometheus.monitoring:9090
+        isDefault: true
+        editable: true
   sidecar:
     dashboards:
       enabled: true
       searchNamespace: ALL
       label: grafana_dashboard
+      labelValue: "1"
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+      label: grafana_datasource
       labelValue: "1"
 
 kubeApiServer:
