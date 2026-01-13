@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+  labels:
+    app: home-assistant
+    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/component: automation
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: "true"
+    traefik.ingress.kubernetes.io/headers.custom-request-headers: "X-Forwarded-Proto:https"
+    traefik.ingress.kubernetes.io/headers.custom-response-headers: "X-Frame-Options:SAMEORIGIN"
+spec:
+  ingressClassName: traefik
+  tls:
+  - hosts:
+    - homeassistant.katrelleslab.org
+    secretName: home-assistant-tls
+  rules:
+  - host: homeassistant.katrelleslab.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: home-assistant
+            port:
+              number: 80
